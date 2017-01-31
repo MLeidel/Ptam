@@ -1,5 +1,5 @@
 /*
-ptam.js
+ptam1.js (9/3/16)
 Programming Textarea Mobile
 This is a "subset" of the "Pta" library.
 (C) Michael D Leidel, 2016
@@ -19,6 +19,8 @@ initialize: function(sid) {
 	Oid.style.tabSize = 3;
 	Oid.style.MozTabSize = 3;
 	Ptam.setIndent(Oid);
+	Ptam.setAdd(Oid);
+	Ptam.setZen(Oid);
 },
 
 /*
@@ -159,6 +161,100 @@ setIndent: function(TAo) {
 			}
 		});
 
-}	// end setIndent
+},	// end setIndent
+
+setAdd: function(TAo) {
+
+	TAo.addEventListener("keydown", function(event) {
+		if (String.fromCharCode(event.which).toLowerCase() === "v" && event.altKey) {
+			event.preventDefault();
+			var txt, sels, sele, stxt, inx;
+			var aline = [];
+			var tot = 0.0;
+			var ctr = 0;
+			sels = this.selectionStart;
+			sele = this.selectionEnd;
+			txt	= this.value;
+			stxt= txt.slice(sels,sele);
+			aline = stxt.split("\n");
+			if (aline.length === 1) {
+				alert("eval: " + eval(stxt));
+				return;				
+			} else {
+				for( inx=0; inx < aline.length; inx++ ) {
+					ctr += 1;
+					tot += parseFloat(aline[inx]);
+				}
+				alert(ctr + " lines\n" + tot);
+				return;
+			}
+		}
+	});
+
+},	// end setAdd
+
+setZen:function(TAo) {
+
+	var lastWrap = "";
+
+	TAo.addEventListener("keydown", function(event) {
+		if (String.fromCharCode(event.which).toLowerCase() === "a" && event.altKey) {
+			zentage(0);
+			event.preventDefault();
+			return;
+		}
+	});
+
+	function zentage(m) {
+		var p1, p2, stag, sels, sele, txt, stxt;
+		sels = TAo.selectionStart;
+		sele = TAo.selectionEnd;
+		txt = TAo.value;
+		stxt = txt.slice(sels, sele);
+		p1 = txt.slice(0, sels);
+		p2 = txt.slice(sele);
+		if (sels === sele) {
+			alert("nothing selected");
+			return;
+		}
+		if (m === 0) {
+			stag = prompt("Enter enclose character\n or command");
+			lastWrap = stag;
+		} else {
+			stag = lastWrap;
+		}
+		if (stag === null) {
+			return;
+		}
+		if (stag === "") {
+			return;
+		}
+		if (stag === "ucase") {
+			stxt = stxt.toUpperCase();
+		} else {
+			if (stag === "lcase") {
+				stxt = stxt.toLowerCase();
+			} else {
+				if (stag.startsWith("sep")) {
+					let x;
+					let ch = stag.substring(stag.indexOf(",")+1).trim();
+					let news = ch;
+					for (x=0; x < stxt.length; x++) {
+						news += stxt.charAt(x) + ch;
+					}
+					stxt = news;
+				} else {
+					stxt = stag + stxt + stag;
+				}
+			}
+		}
+		txt = p1 + stxt + p2;
+		TAo.value = txt;
+		TAo.selectionEnd = txt.length - p2.length;
+		TAo.selectionStart = txt.length - p2.length;
+		return;
+	}
+
+}
 
 };
